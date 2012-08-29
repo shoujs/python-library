@@ -131,7 +131,7 @@ class Airship(object):
     def get_device_tokens(self):
         return AirshipDeviceList(self)
 
-    def push(self, payload, device_tokens=None, aliases=None, tags=None):
+    def push(self, payload, device_tokens=None, aliases=None, tags=None, schedule_for=None):
         """Push this payload to the specified device tokens and tags."""
         if device_tokens:
             payload['device_tokens'] = device_tokens
@@ -139,6 +139,8 @@ class Airship(object):
             payload['aliases'] = aliases
         if tags:
             payload['tags'] = tags
+        if schedule_for:
+            payload['schedule_for'] = schedule_for
         body = json.dumps(payload)
         status, response = self._request('POST', body, PUSH_URL,
             'application/json')
@@ -165,10 +167,12 @@ class Airship(object):
         if not status == 200:
             raise AirshipFailure(status, response)
 
-    def broadcast(self, payload, exclude_tokens=None):
+    def broadcast(self, payload, exclude_tokens=None, schedule_for=None):
         """Broadcast this payload to all users."""
         if exclude_tokens:
             payload['exclude_tokens'] = exclude_tokens
+        if schedule_for:
+            payload['schedule_for'] = schedule_for
         body = json.dumps(payload)
         status, response = self._request('POST', body, BROADCAST_URL,
             'application/json')
