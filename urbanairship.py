@@ -178,6 +178,7 @@ class Airship(object):
             'application/json')
         if not status == 200:
             raise AirshipFailure(status, response)
+        return response
 
     def feedback(self, since):
         """Return device tokens marked inactive since this timestamp.
@@ -207,3 +208,13 @@ class Airship(object):
         return [
             (r['device_token'], parse(r['marked_inactive_on']), r['alias'])
             for r in data]
+    
+    def cancel_push(self, url):
+        """
+        response code 404 means the url is missing, handle it on appliction instead of the lib
+        """
+        status, response = self._request('DELETE', None, url, None)
+        if not (status == 204 or status == 404):
+            raise AirshipFailure(status, response)
+        return status
+        
